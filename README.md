@@ -1,2 +1,2 @@
-# cs50-artificial-intelligence-with-pyrhon
+# cs50-artificial-intelligence-with-python
 Repositório destinado a manter todos os códigos desenvolvidos durante atividades, projetos e trabalhos práticos desenvolvidos durante a disciplina de Inteligência Artificial, do curso de bacharelado em Ciência da Computação da Universidade Federal de Ouro Preto, ministrada pelo professor Rodrigo Pedrosa com o conteúdo do curso CS50 Artificial Intelligence with Python de Harvard.
