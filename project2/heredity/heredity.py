@@ -139,9 +139,51 @@ def joint_probability(people, one_gene, two_genes, have_trait):
         * everyone in set `have_trait` has the trait, and
         * everyone not in set` have_trait` does not have the trait.
     """
-    raise NotImplementedError
-
-
+    # Probabilidade final com elemento neutro da multiplicação
+    final_probability = 1.00
+    
+    # Verificar todo o dicionário
+    for person in people:
+        # Informações individuais sobre cada pessoa
+        
+        # Extraindo quantidade de genes, existencia da caracteristica e probabilidade de ter ou não a caracteristica
+        gene = 1 if person in one_gene else 2 if person in two_genes else 0
+        trait = True if person in have_trait else False
+        trait_prob = PROBS["trait"][gene][trait]
+        # Pais
+        mother = people[person]["mother"]
+        father = people[person]["father"]
+        
+        # Caso não tenha os pais listados, usa-se os valores padrões
+        if not mother and not father:
+            probability = PROBS["gene"][gene]
+        # Caso os pais estejam listados
+        else:
+            # Quantidadede dos genes para o pai e a mae
+            gene_mother = 2 if mother in two_genes else 1 if mother in one_gene else 0
+            gene_father = 2 if father in two_genes else 1 if father in one_gene else 0
+            
+            # Probabilidade do pai e da mae passarem o gene (ou genes) para o filho - 0.01 caso não tenha nennum gene, 0,5 acaso haja um gene, 99 casa haja dois genes
+            prob_mother = 0.5 if gene_mother == 1 else 0.01 if gene_mother == 0 else 0.99
+            prob_father = 0.5 if gene_father == 1 else 0.01 if gene_father == 0 else 0.99
+            
+            # Cálculo das probabilidades, avaliando as probabilidades do pai e da mae
+            # Caso em que se deseja saber se a probilidade de não herdar o gene
+            if gene == 0:
+                probability = (1 - prob_mother) * (1 - prob_father)
+            # Caso em que se deseja saber se a probilidade de herdar um gene
+            elif gene == 1:
+                probability = ((1 - prob_mother) * prob_father) + ((1 - prob_father) * prob_mother)
+            # Caso em que se deseja saber se a probilidade de herdar dois genes
+            else:
+                probability = prob_mother * prob_father
+            
+        # Produto com as probabilidades anteriormente calculadas
+        final_probability *= probability * trait_prob
+        
+    return final_probability
+ 
+            
 def update(probabilities, one_gene, two_genes, have_trait, p):
     """
     Add to `probabilities` a new joint probability `p`.
@@ -149,15 +191,33 @@ def update(probabilities, one_gene, two_genes, have_trait, p):
     Which value for each distribution is updated depends on whether
     the person is in `have_gene` and `have_trait`, respectively.
     """
-    raise NotImplementedError
-
-
+    
+    # Percorre o dicionário
+    for person in probabilities:
+        # Obtenção dos índices do dicionário para atualização
+        gene = 2 if person in two_genes else 1 if person in one_gene else 0
+        trait = True if person in have_trait else False
+        
+        # Atualização dos índices propriamente ditos
+        probabilities[person]["gene"][gene] += p
+        probabilities[person]["trait"][trait] += p
+   
+    
 def normalize(probabilities):
     """
     Update `probabilities` such that each probability distribution
     is normalized (i.e., sums to 1, with relative proportions the same).
     """
-    raise NotImplementedError
+    # Percorre todo o dicionário
+    for person in probabilities:
+        # Percorre as distribuições que serão normalizadas
+        distribuicoes = probabilities[person]
+        for distribuicao in distribuicoes:
+            # Soma os valores da distribuicao para posteriomente dividir no processo de normalização
+            total = sum(probabilities[person][distribuicao].values())
+            # Normaliza todos os valores da distribuição dividindo pela soma total
+            for value in probabilities[person][distribuicao]:
+                probabilities[person][distribuicao][value] /= total
 
 
 if __name__ == "__main__":
